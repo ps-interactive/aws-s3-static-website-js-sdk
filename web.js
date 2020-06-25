@@ -1,92 +1,54 @@
 const { message } = require('./utils.js');
 
-const createBucket = (name) => {};
-
-const upload = (name) => {};
-
-/*
-
-// Load the AWS SDK for Node.js
-var AWS = require('aws-sdk');
-// Set the region 
+const AWS = require('aws-sdk');
 AWS.config.update({region: 'REGION'});
 
-// Create S3 service object
-s3 = new AWS.S3({apiVersion: '2006-03-01'});
+const s3 = new AWS.S3({apiVersion: '2006-03-01'});
 
-var bucketParams = {Bucket: process.argv[2]};
-
-// call S3 to retrieve the website configuration for selected bucket
-s3.getBucketWebsite(bucketParams, function(err, data) {
-  if (err) {
-    console.log("Error", err);
-  } else if (data) {
-    console.log("Success", data);
-  }
-});
-
-// Load the AWS SDK for Node.js
-var AWS = require('aws-sdk');
-// Set the region 
-AWS.config.update({region: 'REGION'});
-
-// Create S3 service object
-s3 = new AWS.S3({apiVersion: '2006-03-01'});
-
-// Create JSON for putBucketWebsite parameters
-var staticHostParams = {
-  Bucket: '',
-  WebsiteConfiguration: {
-    ErrorDocument: {
-      Key: ''
-    },
-    IndexDocument: {
-      Suffix: ''
-    },
-  }
+const createBucket = (name) => {
+  const params = { "Bucket": name };
+  s3.createBucket(params, message);
 };
 
-// Insert specified bucket name and index and error documents into params JSON
-// from command line arguments
-staticHostParams.Bucket = process.argv[2];
-staticHostParams.WebsiteConfiguration.IndexDocument.Suffix = process.argv[3];
-staticHostParams.WebsiteConfiguration.ErrorDocument.Key = process.argv[4];
+const upload = (bucket, name) => {
+  const params = { "Bucket": bucket, "Key": "", "Body": "" };
+  const fileStream = fs.createReadStream(name);
+  fileStream.on("error", err => console.log("File Error", err));
+  
+  params.Body = fileStream;
+  params.Key = path.basename(name);
 
-// set the new website configuration on the selected bucket
-s3.putBucketWebsite(staticHostParams, function(err, data) {
-  if (err) {
-    // display error message
-    console.log("Error", err);
-  } else {
-    // update the displayed website configuration for the selected bucket
-    console.log("Success", data);
-  }
-});
+  s3.upload(params,  (err, data) => {
+    if (err) { console.log("Error", err); } 
+    else { console.log("Upload Success", data.Location); }
+  });
+};
 
-// Load the AWS SDK for Node.js
-var AWS = require('aws-sdk');
-// Set the region 
-AWS.config.update({region: 'REGION'});
+const getWebsiteConfig = (name) => {
+  const params = { "Bucket": name };
+  s3.getBucketWebsite(params, message);
+};
 
-// Create S3 service object
-s3 = new AWS.S3({apiVersion: '2006-03-01'});
+const enableWebsiteConfig = (name, index, error) => {
+  const params = {
+    "Bucket": name,
+    "WebsiteConfiguration": {
+      "ErrorDocument": { "Key": "" },
+      "IndexDocument": { "Suffix": "" },
+    }
+  };
 
-var bucketParams = {Bucket: process.argv[2]};
+  params.Bucket = name;
+  params.WebsiteConfiguration.IndexDocument.Suffix = index;
+  params.WebsiteConfiguration.ErrorDocument.Key = error;
 
-// call S3 to delete website configuration for selected bucket
-s3.deleteBucketWebsite(bucketParams, function(error, data) {
-  if (error) {
-    console.log("Error", err);
-  } else if (data) {
-    console.log("Success", data);
-  }
-});
+  s3.putBucketWebsite(params, message);
+};
 
-*/
-
-const enableWebsiteConfig = (name) => {};
-
-const disableWebsiteConfig = (name) => {};
+const disableWebsiteConfig = (name) => {
+  const params = { Bucket: name };
+  s3.deleteBucketWebsite(params, message);
+};
 
 
 /****
@@ -96,7 +58,7 @@ const cli = require('./cli.js');
 switch (cli.command) {
   case  'create': createBucket(cli.resourceName); break;
   case  'upload': upload(cli.resourceName); break;
-  case  'enable': enableWebsiteConfig(cli.resourceName); break;
+  case  'enable': enableWebsiteConfig(cli.resourceName, cli.index, cli.error); break;
   case 'disable': disableWebsiteConfig(cli.resourceName); break;
   default       : console.error('Not a valid command!'); break;
 }

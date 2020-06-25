@@ -10,3 +10,5 @@ const message = (err, data) => {
     console.log(`Success: ${json}`);
   }
 };
+
+module.exports = { message };
