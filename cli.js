@@ -1,7 +1,7 @@
 const parse = require('minimist')(process.argv.slice(2));
 const command = parse._[0];
-const resourceName = parse._[1];
-const index = parse._[2];
+const resource = parse._[1];
+const dir_index = parse._[2];
 const error = parse._[3];
 
-module.exports = { command, resourceName, index, error };
+module.exports = { command, resource, dir_index, error };

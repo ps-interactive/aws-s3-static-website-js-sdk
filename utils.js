@@ -11,4 +11,19 @@ const message = (err, data) => {
   }
 };
 
-module.exports = { message };
+const paths = (dir, container) => {
+  const files = fs.readdirSync(dir)
+  container = container || []
+  files.forEach((file) => {
+    if (fs.statSync(dir + "/" + file).isDirectory()) {
+      container = paths(dir + "/" + file, container);
+    } else {
+      container.push(path.join(__dirname, dir, "/", file));
+    }
+  })
+  return container;
+}
+
+
+
+module.exports = { message, paths };
