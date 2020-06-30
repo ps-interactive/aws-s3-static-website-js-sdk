@@ -35,7 +35,6 @@ const disableWebsiteConfig = (name) => {
 const cli = require('./cli.js');
 switch (cli.command) {
   case  'create': createUpload(cli.resource, cli.dir_index); break;
-  case  'upload': upload(cli.resource); break;
   case     'get': getWebsiteConfig(cli.resource); break;
   case  'enable': enableWebsiteConfig(cli.resource, cli.dir_index, cli.error); break;
   case 'disable': disableWebsiteConfig(cli.resource); break;

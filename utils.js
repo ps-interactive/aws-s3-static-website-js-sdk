@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 const message = (err, data) => {
   if (err) { console.log(`Error: ${err.message}`); }
@@ -23,7 +24,5 @@ const paths = (dir, container) => {
   })
   return container;
 }
-
-
 
 module.exports = { message, paths };
