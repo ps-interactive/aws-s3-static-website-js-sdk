@@ -29,7 +29,6 @@ const disableWebsiteConfig = (name) => {
   s3.deleteBucketWebsite({ "Bucket": name }, message);
 };
 
-
 /****
  CLI 
 ****/
