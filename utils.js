@@ -19,26 +19,41 @@ const message = (err, data) => {
 };
 
 const paths = (dir, container) => {
-  const files = fs.readdirSync(dir)
-  container = container || []
+  const files = fs.readdirSync(dir);
+  container = container || [];
   files.forEach((file) => {
     if (fs.statSync(dir + "/" + file).isDirectory()) {
       container = paths(dir + "/" + file, container);
     } else {
       container.push(path.join(dir, "/", file));
     }
-  })
-  return container;
-}
-
-const upload = (name, file) => {
-  const fileStream = fs.createReadStream(file);
-  fileStream.on("error", err => console.log("File Error", err));
-  const params = { "Bucket": name, "Key": file, "Body": fileStream };
-  s3.upload(params, (err, data) => {
-    if (err) { console.log("Error", err); } 
-    else { console.log("Upload Success", data.Location); }
   });
-}
+  return container;
+};
+
+const contentType = (file) => {
+  let rc = 'application/octet-stream';
+  const fn = file.toLowerCase();
+
+  if (fn.indexOf('.html') >= 0) rc = 'text/html';
+  else if (fn.indexOf('.css') >= 0) rc = 'text/css';
+  else if (fn.indexOf('.json') >= 0) rc = 'application/json';
+  else if (fn.indexOf('.js') >= 0) rc = 'application/x-javascript';
+  else if (fn.indexOf('.png') >= 0) rc = 'image/png';
+  else if (fn.indexOf('.jpg') >= 0) rc = 'image/jpg';
+
+  return rc;
+};
+
+const upload = (name, root, file) => {
+  const body = fs.readFileSync(file);
+  const type = contentType(file);
+  const rootless = file.replace(`${root}/`, "");
+  const params = { "ACL": 'public-read', "Bucket": name, "Key": rootless, "Body": body, "ContentType": type };
+  s3.putObject(params, (err, data) => {
+    if (err) { console.log("Error", err); } 
+    else { console.log("Upload Success", data); }
+  });
+};
 
 module.exports = { message, paths, upload };
