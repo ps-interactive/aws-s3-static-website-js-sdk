@@ -10,15 +10,13 @@ AWS.config.apiVersions = { 's3': '2006-03-01' };
 const s3 = new AWS.S3();
 
 const createUpload = (name, dir) => {
-  const files = paths(dir);
   s3.createBucket({ "Bucket": name }, (err, data) => {
     if (err) { console.log("Error", err); }
-    else { files.forEach(file => upload(name, file)); }
+    else {
+      const files = paths(dir);
+      files.forEach(file => upload(name, file));
+    }
   });
-};
-
-const getWebsiteConfig = (name) => {
-  s3.getBucketWebsite({ "Bucket": name }, message);
 };
 
 const enableWebsiteConfig = (name, index, error) => {
@@ -30,6 +28,10 @@ const enableWebsiteConfig = (name, index, error) => {
     }
   };
   s3.putBucketWebsite(params, message);
+};
+
+const getWebsiteConfig = (name) => {
+  s3.getBucketWebsite({ "Bucket": name }, message);
 };
 
 const disableWebsiteConfig = (name) => {
