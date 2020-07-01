@@ -41,4 +41,4 @@ const upload = (name, dir, file) => {
   });
 }
 
-module.exports = { message, paths };
+module.exports = { message, paths, upload };
