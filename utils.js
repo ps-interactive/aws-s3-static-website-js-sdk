@@ -31,7 +31,7 @@ const paths = (dir, container) => {
   return container;
 }
 
-const upload = (name, dir, file) => {
+const upload = (name, file) => {
   const fileStream = fs.createReadStream(file);
   fileStream.on("error", err => console.log("File Error", err));
   const params = { "Bucket": name, "Key": file, "Body": fileStream };
