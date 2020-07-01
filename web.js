@@ -1,4 +1,7 @@
-const { message, paths } = require('./utils.js');
+const fs = require('fs');
+const path = require('path');
+
+const { message, paths, upload } = require('./utils.js');
 
 const AWS = require('aws-sdk');
 AWS.config.region = 'us-west-2';
@@ -7,7 +10,11 @@ AWS.config.apiVersions = { 's3': '2006-03-01' };
 const s3 = new AWS.S3();
 
 const createUpload = (name, dir) => {
-  console.log(paths(dir))
+  const files = paths(dir);
+  s3.createBucket({ "Bucket": name }, (err, data) => {
+    if (err) { console.log("Error", err); }
+    else { files.forEach(file => upload(name, file)); }
+  });
 };
 
 const getWebsiteConfig = (name) => {
